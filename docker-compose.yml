@@ -13,16 +13,6 @@ services:
     depends_on:
       - db
 
-  celery:
-    build: ./app
-    command: celery -A exam worker -l INFO
-    volumes:
-      - ./app/:/usr/src/app/
-    env_file:
-      - ./.env.dev
-    depends_on:
-      - db
-      - redis
 
   db:
     image: postgres:15.1
@@ -36,10 +26,6 @@ services:
           - POSTGRES_USER=development_user
           - POSTGRES_PASSWORD=qweasd!23
 
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
 
 
 volumes:
