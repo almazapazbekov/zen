@@ -4,10 +4,19 @@ from django.db.models import Avg
 from account.models import Author
 
 
-class Posts(models.Model):
+class TextAuthorAbstract(models.Model):
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.text[0:30]}... - {self.author}'
+
+    class Meta:
+        abstract = True
+
+
+class Posts(TextAuthorAbstract):
 
     @property
     def average_rating(self):
@@ -16,23 +25,19 @@ class Posts(models.Model):
         total = 0
         for rating in ratings:
             total += rating.rating
+        if len(ratings) == 0:
+            return 0
+        else:
+            return total / len(ratings)
 
-        return total/len(ratings)
 
-    def __str__(self):
-        return f'{self.text[0:10]}... - {self.author}'
-
-
-class Comments(models.Model):
+class Comments(TextAuthorAbstract):
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    text = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
 
 
 class Status(models.Model):
     choices = [
-        (None, 'none'),
+        (None, 'None'),
         (1, '1'),
         (2, '2'),
         (3, '3'),
@@ -40,7 +45,12 @@ class Status(models.Model):
         (5, '5'),
     ]
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    rating = models.IntegerField(choices=choices, default=None)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=choices, default=None, null=True, blank=True)
+
+
+    class Meta:
+        unique_together = ['post', 'author', ]
 
     def __str__(self):
-        return str(self.rating)
+        return f'{str(self.rating)} - {self.post}'
