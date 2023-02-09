@@ -19,7 +19,6 @@ class PostsDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ['author', ]
 
 
-
 class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments
@@ -32,6 +31,3 @@ class StatusSerializer(serializers.ModelSerializer):
         model = Status
         fields = "__all__"
         read_only_fields = ['post', 'author', ]
-
-
-

@@ -72,16 +72,18 @@ class PostStatusAPI(views.APIView):
 class CommentListCreateAPIView(generics.ListCreateAPIView):
     queryset = Comments.objects.all()
     serializer_class = CommentsSerializer
-    permission_classes = []
 
     def get_queryset(self):
         return super().get_queryset().filter(post_id=self.kwargs.get('post_id'))
 
     def perform_create(self, serializer):
-        serializer.save(
-            post_id=self.kwargs.get('post_id'),
-            author=self.request.user.author
-        )
+        if self.request.user.is_authenticated:
+            serializer.save(
+                post_id=self.kwargs.get('post_id'),
+                author=self.request.user.author
+            )
+        else:
+            serializer.save(post_id=self.kwargs.get('post_id'))
 
 
 class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
